@@ -49,7 +49,7 @@ A stack é **parametrizada por um único arquivo de configuração** localizado 
 Exemplo de `.docker/.config-docker`:
 
 ```dotenv
-STACK=jogo_gauchov1
+STACK=novo_projeto_2023
 COMPOSE_PROJECT_NAME=${STACK}
 
 HTTP_PORT=80
