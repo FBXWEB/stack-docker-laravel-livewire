@@ -1,0 +1,62 @@
+######################################################################################################################
+## Referência das variáveis
+## -- Identidade e Escopo:
+## || STACK: Identificador curto e único da stack. É usado como prefixo de container_name, volume e network.
+##
+## || COMPOSE_PROJECT_NAME: Define o “namespace” do Compose (equivalente a -p). Normalmente: ${STACK}.
+## 
+## -- Portas:
+## -- OBS: se precisar rodar duas stacks simultâneas, altere essas portas para evitar conflito.
+## || HTTP_PORT: mapeia 80 do Nginx para o host. Padrão: 80.
+## || HTTPS_PORT: mapeia 443 do Nginx. Padrão: 443.
+## || PMA_PORT: porta do phpMyAdmin no host. Padrão: 8080.
+## || MAILHOG_SMTP: SMTP do MailHog no host. Padrão: 1025.
+## || MAILHOG_UI: UI do MailHog no host. Padrão: 8025.
+##
+## -- MYSQL
+## || MYSQL_DATABASE: nome do DB a ser criado na 1ª inicialização do volume.
+## || MYSQL_USER, MYSQL_PASSWORD: usuário e senha da base de dados.
+## || MYSQL_ROOT_PASSWORD: senha do usuário root.
+## 
+## -- SSL (opcional)
+## -- OBS: Caminhos no projeto para o cert e a chave. Se não existirem, deixe USE_SSL=false
+## || USE_SSL:true/false. Quando true, monte os arquivos apontados por (SSL_CERT_PATH e SSL_KEY_PATH)
+## 
+## -- ultrahook (opcional)
+## || ULTRAHOOK_API_KEY: Chave de API para o container ultrahook (tunelamento de webhooks). 
+## Deixe vazio se não for usar.
+#######################################################################################################################
+
+# Identidade da stack (prefixo de containers/rede/volume)
+# use sempre "_" entre as palavras, ex: novo_projeto_2023
+STACK=novo_projeto_2023
+COMPOSE_PROJECT_NAME=${STACK}
+
+# Ports // ATENÇÃO, VOCÊ NÃO PRECISA ALTERAR SE FOR RODAR UMA STACK POR VEZ
+HTTP_PORT=80
+HTTPS_PORT=443
+PMA_PORT=8080
+MAILHOG_SMTP=1025
+MAILHOG_UI=8025
+
+# MySQL - ALTERE SE QUISER CUSTOMIZAR AS CREDENCIAIS DA BASE DE DADOS
+# o container cria DB/usuário na 1ª inicialização do volume
+MYSQL_DATABASE=database_${STACK}
+MYSQL_USER=db_user_${STACK}
+MYSQL_PASSWORD=pamonha0237
+MYSQL_ROOT_PASSWORD=root_password
+
+# SSL local (se tiver certificados)
+# SALVE AS CHAVES NO CAMINHO ABAIXO (USE O EXEMPLO SOMENTE EM DESENVOLVIMENTO)
+# NÃO USE AS CHAVES DE TESTE PARA PRODUÇÃO
+USE_SSL=true #Padrão: true
+SSL_CERT_PATH=.docker/php/localhost+2.pem
+SSL_KEY_PATH=.docker/php/localhost+2-key.pem
+
+# ULTRAHOOK:
+## Como obter a Ultrahook API Key:
+## Acesse o site do Ultrahook: https://www.ultrahook.com/
+## Crie uma conta ou faça login.
+## No painel/console do usuário, localize a API Key (geralmente listada no dashboard ou em "Account/Settings").
+## Copie a chave e cole no seu arquivo de configuração abaixo:
+ULTRAHOOK_API_KEY=

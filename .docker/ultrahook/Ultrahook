@@ -1,0 +1,9 @@
+FROM ruby:2.7
+
+RUN gem install ultrahook
+
+COPY start_ultrahook.sh /start_ultrahook.sh
+
+RUN chmod +x /start_ultrahook.sh
+
+ENTRYPOINT ["/start_ultrahook.sh"]
