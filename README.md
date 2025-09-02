@@ -7,55 +7,132 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# DOCKER STACK TEMPLATE - LARAVEL 12 + LIVEWIRE 3
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Este repositório contém uma **stack Docker pronta para PHP**, incluindo:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Nginx** (webserver)  
+- **PHP-FPM 8.2** (com extensões comuns + Node.js 20 + Composer)  
+- **MySQL 8**  
+- **phpMyAdmin**  
+- **MailHog** (captura de e-mails em ambiente dev)  
+- **Ultrahook** (opcional – tunelamento de webhooks)  
+- **Composer2** (Para instalação de dependências, ex: laravel, codeigniter e etc..)
 
-## Learning Laravel
+A stack é **parametrizada por um único arquivo de configuração** localizado em:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```
+.docker/.config-docker
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## ESTRUTURA
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+.
+├─ docker-compose.yml        # Stack principal
+├─ .docker/
+│  ├─ .config-docker         # Arquivo de configuração (copie do .example)
+│  ├─ php/
+│  │  ├─ Dockerfile
+│  │  └─ php.ini
+│  ├─ nginx/
+│  │  └─ default.conf
+│  └─ mysql/
+│     └─ init-db.sql (definir previlégios para usuário da base de dados)
+└─ README.md
+```
 
-## Laravel Sponsors
+## CONFIGURAÇÕES
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. **Crie o arquivo de configuração** copiando o exemplo:
+   ```bash
+   cp .docker/.config-docker.example .docker/.config-docker
+   ```
 
-### Premium Partners
+2. **Edite as variáveis** conforme o projeto:
+   - `STACK` → nome único da stack (usado em containers, rede e volumes)  
+   - `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`  
+   - `HTTP_PORT`, `HTTPS_PORT`, `PMA_PORT`, `MAILHOG_UI`, etc.  
+   - `ULTRAHOOK_API_KEY` (se for usar tunelamento)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Exemplo de `.docker/.config-docker`:
 
-## Contributing
+```dotenv
+STACK=novo_projeto_2023
+COMPOSE_PROJECT_NAME=${STACK}
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+HTTP_PORT=80
+HTTPS_PORT=443
+PMA_PORT=8080
+MAILHOG_SMTP=1025
+MAILHOG_UI=8025
 
-## Code of Conduct
+MYSQL_DATABASE=database_${STACK}
+MYSQL_USER=db_user_${STACK}
+MYSQL_PASSWORD=sEnHasEgUrA
+MYSQL_ROOT_PASSWORD=root_password
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+USE_SSL=false
+SSL_CERT_PATH=.docker/php/localhost+2.pem
+SSL_KEY_PATH=.docker/php/localhost+2-key.pem
 
-## Security Vulnerabilities
+ULTRAHOOK_API_KEY=
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## SUBINDO UM NOVO PROJETO
+Após configurar corretamente o arquivo `.docker/.config-docker`:
 
-## License
+Subir os containers:
+```bash
+docker compose --env-file .docker/.config-docker up -d --build
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Ver status:
+```bash
+docker compose --env-file .docker/.config-docker ps
+```
+
+Logs:
+```bash
+docker compose --env-file .docker/.config-docker logs -f
+```
+
+Derrubar a stack:
+```bash
+docker compose --env-file .docker/.config-docker down
+```
+
+Resetar dados do MySQL (apaga volume completamente):
+```bash
+docker volume rm ${STACK}-data
+```
+
+## ACESSOS:
+
+- **Aplicação**: [http://localhost:80](http://localhost:80)  
+- **phpMyAdmin**: [http://localhost:8080](http://localhost:8080)  
+- **MailHog UI**: [http://localhost:8025](http://localhost:8025)  
+
+Credenciais do phpMyAdmin:
+- Host: `db`  
+- Usuário: `${MYSQL_USER}`  
+- Senha: `${MYSQL_PASSWORD}`  
+- Ou: `root` / `${MYSQL_ROOT_PASSWORD}`  
+
+## ULTRAHOOK (use se for trabalhar com API/Webhook)
+
+1. Crie uma conta em [https://www.ultrahook.com](https://www.ultrahook.com)  
+2. Pegue sua **API Key** no dashboard da conta  
+3. Configure no `.docker/.config-docker`:  
+   ```dotenv
+   ULTRAHOOK_API_KEY=sua_chave_aqui
+   ```
+4. Suba a stack novamente.
+
+---
+
+## 📖 Licença
+
+Uso interno **FBXWEB - Agência Criativa** © 2023.  
+
