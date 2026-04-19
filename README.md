@@ -118,7 +118,30 @@ Credenciais do phpMyAdmin:
 - Host: `db`  
 - Usuário: `${MYSQL_USER}`  
 - Senha: `${MYSQL_PASSWORD}`  
-- Ou: `root` / `${MYSQL_ROOT_PASSWORD}`  
+- Ou: `root` / `${MYSQL_ROOT_PASSWORD}` 
+
+## PROBLEMA COMUM — ERRO DE ACESSO NO PHPMYADMIN
+
+Caso você visualize o erro:
+
+"Access denied for user" ou falha de conexão com o MySQL no phpMyAdmin
+
+**Isso pode ocorrer devido a uma inconsistência na criação inicial do usuário do banco de dados, especialmente durante o primeiro build da stack.**
+
+
+## SOLUÇÃO:
+
+
+Execute novamente o comando:
+
+```bash
+docker compose --env-file .docker/.config-docker up -d --build
+```
+
+✔️ Não é necessário derrubar os containers  
+✔️ Não é necessário remover volumes  
+✔️ Apenas reexecutar o build para garantir a aplicação correta das permissões  
+
 
 ## ULTRAHOOK (use se for trabalhar com API/Webhook)
 

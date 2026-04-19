@@ -59,4 +59,4 @@ SSL_KEY_PATH=.docker/php/localhost+2-key.pem
 ## Crie uma conta ou faça login.
 ## No painel/console do usuário, localize a API Key (geralmente listada no dashboard ou em "Account/Settings").
 ## Copie a chave e cole no seu arquivo de configuração abaixo:
-ULTRAHOOK_API_KEY=
+ULTRAHOOK_API_KEY=ujNzLVYEB8ueHYakWCW3cHOKcAsARmot

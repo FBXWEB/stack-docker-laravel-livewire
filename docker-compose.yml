@@ -3,22 +3,29 @@
 ## Arquivo de construção do Docker Container                                                           ##
 ## Altere o arquivo .docker/.config-docker                                                             ##
 ## - Não existe necessidade de alterar esse arquivo                                                    ##
-##
-## COMANDOS PARA EXECUTAR:
-## SUBIR OS CONTAINERS:
-## docker compose --env-file .docker/.config-docker up -d --build
-##
-## Ver status / logs:
-## docker compose --env-file .docker/.config-docker ps
-## docker compose --env-file .docker/.config-docker logs -f db (escolha um service)
-## 
-## Derrubar/down Container: 
-## docker compose --env-file .docker/.config-docker down
-##
-## 
+##                                                                                                     ##
+## COMANDOS PARA EXECUTAR:                                                                             ##
+## SUBIR OS CONTAINERS:                                                                                ##
+## docker compose --env-file .docker/.config-docker up -d --build                                      ##
+##                                                                                                     ##
+## Ver status / logs:                                                                                  ##
+## docker compose --env-file .docker/.config-docker ps                                                 ##
+## docker compose --env-file .docker/.config-docker logs -f db (escolha um service)                    ##
+##                                                                                                     ##
+## Derrubar/down Container:                                                                            ##
+## docker compose --env-file .docker/.config-docker down                                               ##
+##                                                                                                     ##
+## ATENÇÃO! Antes de rodar esses comandos, tenha certeza que você configurou o arquivo:                ##
+## .docker/.config/docker                                                                              ##
+##                                                                                                     ##
+## Se caso estiver com dúvidas leia o .docker/README.md                                                ##
 #########################################################################################################
 
-version: '3.8'
+## ATENÇÃO! Se você visualizar erro de Acesso Negado no PHPMYADMIN (usando o Docker)
+## rode novamente o comando: docker compose --env-file .docker/.config-docker up -d --build
+## Não precisa derrubar os containers, só rodar mais uma vez para reconstruir as permissões
+
+#version: '3.8'
 
 networks:
   app-network:
@@ -71,7 +78,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - app-data:/var/lib/mysql
-      - ./.docker/mysql/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      #- ./.docker/mysql/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - app-network
     healthcheck:
