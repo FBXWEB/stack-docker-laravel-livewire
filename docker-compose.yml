@@ -32,6 +32,7 @@ networks:
 
 volumes:
   app-data:
+  app-data-mysql84:
 
 services:
   webserver:
@@ -66,26 +67,40 @@ services:
     networks:
       - app-network
 
+
   db:
-    image: mysql:8.0
+    image: mysql:8.4
     container_name: ${STACK}_db
     restart: unless-stopped
-    command: ["--default-authentication-plugin=mysql_native_password"]
+
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
     volumes:
-      - app-data:/var/lib/mysql
-      #- ./.docker/mysql/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - app-data-mysql84:/var/lib/mysql
+
     networks:
       - app-network
+
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      test:
+        - CMD-SHELL
+        - >-
+          MYSQL_PWD="$${MYSQL_PASSWORD}"
+          mysql --protocol=TCP
+          -h 127.0.0.1
+          -u "$${MYSQL_USER}"
+          --database="$${MYSQL_DATABASE}"
+          --batch --skip-column-names
+          -e "SELECT 1" >/dev/null 2>&1
       interval: 5s
       timeout: 3s
-      retries: 20
+      retries: 30
+      start_period: 60s
+
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
